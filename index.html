@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronósticos Deportivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Navegación por deportes */
+        .menu-deportes {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .menu-deportes h2 {
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+        }
+
+        .deportes-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .deporte-btn {
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+        }
+
+        .deporte-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .deporte-btn.futbol {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .deporte-btn.baloncesto {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        .deporte-btn.tenis {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        /* Secciones de deportes */
+        .seccion-deporte {
+            margin-bottom: 3rem;
+        }
+
+        .deporte-header {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .deporte-header.futbol {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .deporte-header.baloncesto {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        .deporte-header.tenis {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .liga-titulo {
+            color: #e94560;
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem;
+            padding-left: 1rem;
+            border-left: 4px solid #e94560;
+        }
+
+        /* Tarjetas de partidos */
+        .partido-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .partido-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .liga-tag {
+            grid-column: 1 / -1;
+            background: #1a1a2e;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            width: fit-content;
+            margin-bottom: 0.5rem;
+        }
+
+        .equipo {
+            text-align: center;
+        }
+
+        .equipo-local {
+            text-align: right;
+        }
+
+        .equipo-visitante {
+            text-align: left;
+        }
+
+        .equipo-nombre {
+            font-weight: bold;
+            font-size: 1.15rem;
+            color: #1a1a2e;
+            margin-bottom: 0.3rem;
+        }
+
+        .equipo-stats {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .vs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .vs-text {
+            background: #1a1a2e;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .prediccion {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .prediccion.gana-local {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .prediccion.gana-visitante {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .prediccion.empate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .marcador-previsto {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e94560;
+            background: #f3f4f6;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+        }
+
+        /* Estadísticas */
+        .stats {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .stats h2 {
+            color: #1a1a2e;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-card .stat-num {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stat-card.futbol {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .stat-card.baloncesto {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        .stat-card.tenis {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .stat-card:not(.futbol):not(.baloncesto):not(.tenis) {
+            background: linear-gradient(135deg, #533483, #e94560);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .partido-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .equipo-local, .equipo-visitante {
+                text-align: center;
+            }
+
+            .deportes-nav {
+                flex-direction: column;
+            }
+
+            .deporte-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏆 Pronósticos Deportivos</h1>
+        <p>Predicciones para Fútbol, Baloncesto y Tenis</p>
+    </header>
+
+    <main>
+        <!-- NAVEGACIÓN POR DEPORTES -->
+        <section class="menu-deportes">
+            <h2>Selecciona el Deporte</h2>
+            <div class="deportes-nav">
+                <a href="#futbol" class="deporte-btn futbol">⚽ Fútbol</a>
+                <a href="#baloncesto" class="deporte-btn baloncesto">🏀 Baloncesto</a>
+                <a href="#tenis" class="deporte-btn tenis">🎾 Tenis</a>
+            </div>
+        </section>
+
+        <!-- FÚTBOL -->
+        <section id="futbol" class="seccion-deporte">
+            <div class="deporte-header futbol">
+                <h2>⚽ Fútbol</h2>
+            </div>
+
+            <h3 class="liga-titulo">La Liga</h3>
+            <div class="partido-card">
+                <span class="liga-tag">⚽ La Liga • Sáb 19/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Real Madrid</div>
+                    <div class="equipo-stats">Fuerza: 95</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">2 - 0</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Betis</div>
+                    <div class="equipo-stats">Fuerza: 79</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">⚽ La Liga • Dom 20/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Barcelona</div>
+                    <div class="equipo-stats">Fuerza: 93</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">3 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Villarreal</div>
+                    <div class="equipo-stats">Fuerza: 82</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">⚽ La Liga • Lun 21/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Sevilla</div>
+                    <div class="equipo-stats">Fuerza: 84</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion empate">Empate</span>
+                    <div class="marcador-previsto">1 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Real Sociedad</div>
+                    <div class="equipo-stats">Fuerza: 83</div>
+                </div>
+            </div>
+
+            <h3 class="liga-titulo">Premier League</h3>
+            <div class="partido-card">
+                <span class="liga-tag">⚽ Premier League • Sáb 19/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Manchester City</div>
+                    <div class="equipo-stats">Fuerza: 96</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">3 - 0</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Tottenham</div>
+                    <div class="equipo-stats">Fuerza: 83</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">⚽ Premier League • Dom 20/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Arsenal</div>
+                    <div class="equipo-stats">Fuerza: 91</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">2 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Newcastle</div>
+                    <div class="equipo-stats">Fuerza: 82</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">⚽ Premier League • Lun 21/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Liverpool</div>
+                    <div class="equipo-stats">Fuerza: 90</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">3 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Aston Villa</div>
+                    <div class="equipo-stats">Fuerza: 81</div>
+                </div>
+            </div>
+
+            <h3 class="liga-titulo">Champions League</h3>
+            <div class="partido-card">
+                <span class="liga-tag">⚽ Champions • Mar 22/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Manchester City</div>
+                    <div class="equipo-stats">Fuerza: 96</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">2 - 0</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Bayern Munich</div>
+                    <div class="equipo-stats">Fuerza: 92</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">⚽ Champions • Mié 23/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Real Madrid</div>
+                    <div class="equipo-stats">Fuerza: 95</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">2 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">PSG</div>
+                    <div class="equipo-stats">Fuerza: 89</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BALONCESTO -->
+        <section id="baloncesto" class="seccion-deporte">
+            <div class="deporte-header baloncesto">
+                <h2>🏀 Baloncesto</h2>
+            </div>
+
+            <h3 class="liga-titulo">NBA</h3>
+            <div class="partido-card">
+                <span class="liga-tag">🏀 NBA • Sáb 19/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Boston Celtics</div>
+                    <div class="equipo-stats">Ofensiva: 95</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">118 - 108</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Miami Heat</div>
+                    <div class="equipo-stats">Ofensiva: 86</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🏀 NBA • Dom 20/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Denver Nuggets</div>
+                    <div class="equipo-stats">Ofensiva: 94</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">112 - 105</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">LA Lakers</div>
+                    <div class="equipo-stats">Ofensiva: 88</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🏀 NBA • Lun 21/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Golden State Warriors</div>
+                    <div class="equipo-stats">Ofensiva: 90</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-visitante">Gana Visitante</span>
+                    <div class="marcador-previsto">105 - 112</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Milwaukee Bucks</div>
+                    <div class="equipo-stats">Ofensiva: 92</div>
+                </div>
+            </div>
+
+            <h3 class="liga-titulo">Euroliga</h3>
+            <div class="partido-card">
+                <span class="liga-tag">🏀 Euroliga • Jue 24/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Real Madrid</div>
+                    <div class="equipo-stats">Ofensiva: 91</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">95 - 88</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Virtus Bologna</div>
+                    <div class="equipo-stats">Ofensiva: 85</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🏀 Euroliga • Vie 25/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Barcelona</div>
+                    <div class="equipo-stats">Ofensiva: 89</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Local</span>
+                    <div class="marcador-previsto">92 - 86</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Maccabi Tel Aviv</div>
+                    <div class="equipo-stats">Ofensiva: 86</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🏀 Euroliga • Sáb 26/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Olympiacos</div>
+                    <div class="equipo-stats">Ofensiva: 87</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion empate">Muy reñido</span>
+                    <div class="marcador-previsto">87 - 85</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Fenerbahçe</div>
+                    <div class="equipo-stats">Ofensiva: 87</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TENIS -->
+        <section id="tenis" class="seccion-deporte">
+            <div class="deporte-header tenis">
+                <h2>🎾 Tenis</h2>
+            </div>
+
+            <h3 class="liga-titulo">Grand Slams</h3>
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Dom 20/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Novak Djokovic</div>
+                    <div class="equipo-stats">Ranking: 1</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Djokovic</span>
+                    <div class="marcador-previsto">3 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Stefanos Tsitsipas</div>
+                    <div class="equipo-stats">Ranking: 8</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Lun 21/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Carlos Alcaraz</div>
+                    <div class="equipo-stats">Ranking: 2</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Alcaraz</span>
+                    <div class="marcador-previsto">3 - 0</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Andrey Rublev</div>
+                    <div class="equipo-stats">Ranking: 7</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Mar 22/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Jannik Sinner</div>
+                    <div class="equipo-stats">Ranking: 3</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Sinner</span>
+                    <div class="marcador-previsto">3 - 1</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Daniil Medvedev</div>
+                    <div class="equipo-stats">Ranking: 4</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Mié 23/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Alexander Zverev</div>
+                    <div class="equipo-stats">Ranking: 5</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-visitante">Gana Nadal</span>
+                    <div class="marcador-previsto">1 - 3</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Rafael Nadal</div>
+                    <div class="equipo-stats">Ranking: 6</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Jue 24/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Novak Djokovic</div>
+                    <div class="equipo-stats">Ranking: 1</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion gana-local">Gana Djokovic</span>
+                    <div class="marcador-previsto">3 - 2</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Carlos Alcaraz</div>
+                    <div class="equipo-stats">Ranking: 2</div>
+                </div>
+            </div>
+
+            <div class="partido-card">
+                <span class="liga-tag">🎾 Grand Slam • Vie 25/4</span>
+                <div class="equipo equipo-local">
+                    <div class="equipo-nombre">Jannik Sinner</div>
+                    <div class="equipo-stats">Ranking: 3</div>
+                </div>
+                <div class="vs">
+                    <div class="vs-text">VS</div>
+                    <span class="prediccion empate">Muy reñido</span>
+                    <div class="marcador-previsto">3 - 2</div>
+                </div>
+                <div class="equipo equipo-visitante">
+                    <div class="equipo-nombre">Novak Djokovic</div>
+                    <div class="equipo-stats">Ranking: 1</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ESTADÍSTICAS -->
+        <section class="stats">
+            <h2>📊 Resumen de Predicciones</h2>
+            <div class="stats-grid">
+                <div class="stat-card futbol">
+                    <span class="stat-num">9</span>
+                    <span class="stat-label">Partidos Fútbol</span>
+                </div>
+                <div class="stat-card baloncesto">
+                    <span class="stat-num">6</span>
+                    <span class="stat-label">Partidos NBA/Euroliga</span>
+                </div>
+                <div class="stat-card tenis">
+                    <span class="stat-num">6</span>
+                    <span class="stat-label">Partidos Tenis</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">21</span>
+                    <span class="stat-label">Total Eventos</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>⚽ 🏀 🎾 Pronósticos deportivos • Solo para entretenimiento</p>
+    </footer>
+
+</body>
+</html>
